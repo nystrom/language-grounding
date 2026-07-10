@@ -214,6 +214,9 @@ end
 @code_warntype f(1)   # shows inferred types; red/yellow = unstable
 ```
 
+See the toolchain reference (`toolchain.md`, the `@code_warntype` section) for
+reading its output, plus JET.jl and Cthulhu.jl for deeper inspection.
+
 Common causes:
 - Returning different concrete types in different branches
 - Accessing a global variable of non-const type

@@ -21,6 +21,9 @@ end
 # Body contains ::Any or ::Bool (with Union)
 ```
 
+`@code_warntype` is the first-line tool for spotting this — see the toolchain
+reference (`toolchain.md`, the `@code_warntype` section) for reading its output.
+
 **Fix:** declare `const`, or pass as a function argument:
 
 ```julia

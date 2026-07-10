@@ -284,6 +284,18 @@ includet("script.jl")  # includet = include + track
 
 ---
 
+## `@code_warntype` — Built-in Type Inference Check
+
+Built-in; no extra package. Shows type-annotated IR with instability highlighted:
+
+```julia
+@code_warntype f(1, 2.0)
+```
+
+Lines with `::Any` or `Union{...}` in red indicate type instability.
+
+---
+
 ## Cthulhu.jl — Type Inference Inspection
 
 Cthulhu.jl provides an interactive browser for `@code_typed` output, allowing drill-down into type inference:
@@ -298,16 +310,6 @@ Inside the TUI:
 - Press Enter to descend into a called function
 - Red/yellow highlighted variables are type-unstable
 - Press `?` for help
-
-### `@code_warntype` (no extra package)
-
-Built-in; shows type-annotated IR with instability highlighted:
-
-```julia
-@code_warntype f(1, 2.0)
-```
-
-Lines with `::Any` or `Union{...}` in red indicate instability.
 
 ---
 
