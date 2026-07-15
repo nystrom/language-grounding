@@ -42,7 +42,7 @@ except ImportError:
 # ── Paths ──────────────────────────────────────────────────────────────────
 
 REPO_ROOT = Path(__file__).parent.parent
-SKILLS_DIR = REPO_ROOT / "skills"
+SKILLS_DIR = REPO_ROOT / ".claude" / "skills"
 CASE_DIRS = [
     REPO_ROOT / "languages" / "python" / "evals",
     REPO_ROOT / "languages" / "julia" / "evals",
@@ -201,6 +201,7 @@ def call_via_cli(prompt: str, system: str, model: str, retries: int = 3) -> str:
                 cmd,
                 capture_output=True,
                 text=True,
+                stdin=subprocess.DEVNULL,
                 timeout=120,
             )
             if result.returncode == 0 and result.stdout.strip():

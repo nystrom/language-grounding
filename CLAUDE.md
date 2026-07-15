@@ -2,23 +2,18 @@
 
 A collection of Claude Code skills that ground agents in language semantics, preventing analogical hallucination and version confusion.
 
-## Commands
+## Installation
 
+Claude Code automatically discovers and loads these skills when running inside this repository.
+
+To install them globally for all projects:
 ```bash
-# Install all skills
-./install.sh
+# Copy all skills to your global Claude skills directory
+cp -r .claude/skills/* ~/.claude/skills/
 
-# Install a specific language
-./install.sh python
-./install.sh julia
-
-# Install multiple languages
-./install.sh python julia
+# Or symlink them:
+ln -s "$(pwd)/.claude/skills/"* ~/.claude/skills/
 ```
-
-Each `skills/<lang>/` installs as one skill named `<lang>-grounding` at
-`~/.claude/skills/<lang>-grounding/` — the whole directory (router `SKILL.md`
-plus `references/`) is copied.
 
 ## Structure
 
@@ -26,18 +21,18 @@ Each language is a single skill: a router `SKILL.md` that points to per-topic
 files under `references/`.
 
 ```
-skills/
-├── python/
+.claude/skills/
+├── python-grounding/
 │   ├── SKILL.md          # router: name python-grounding, indexes references
 │   └── references/       # semantics, types, stdlib, toolchain,
 │                         #   versions, errors, sharp-edges, packages
-├── julia/
+├── julia-grounding/
 │   ├── SKILL.md          # router: name julia-grounding
 │   └── references/       # same 8 topics as Python
-├── javascript/
+├── javascript-grounding/
 │   ├── SKILL.md          # router: name javascript-grounding
 │   └── references/       # semantics, sharp-edges (narrower coverage)
-└── typescript/
+└── typescript-grounding/
     ├── SKILL.md          # router: name typescript-grounding
     └── references/       # semantics, types, sharp-edges, versions, toolchain
 languages/
@@ -49,12 +44,11 @@ languages/
 
 ## Adding a New Language
 
-1. Create `skills/<lang>/references/<topic>.md` files for each topic
-2. Create `skills/<lang>/SKILL.md` — a router with `name: <lang>-grounding`
+1. Create a new directory `.claude/skills/<lang>-grounding/`
+2. Create references under `.claude/skills/<lang>-grounding/references/<topic>.md` files for each topic
+3. Create `.claude/skills/<lang>-grounding/SKILL.md` — a router with `name: <lang>-grounding`
    frontmatter and a table pointing to each `references/<topic>.md`
-3. Add the language to `README.md` under Skills
-4. `./install.sh <lang>` to verify installation works (auto-discovered — no
-   change to `install.sh` needed)
+4. Add the language to `README.md` under Skills
 
 ## Skill Design Principles
 

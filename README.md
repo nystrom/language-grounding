@@ -12,19 +12,19 @@ does, in which versions it exists, and where the footguns are.
 
 ## Install
 
-```bash
-# Install all language skills
-./install.sh
+Claude Code automatically discovers and loads these skills when running inside this repository.
 
-# Install a specific language
-./install.sh python
+To install them globally for all projects:
+
+```bash
+# Copy all skills to your global Claude skills directory
+cp -r .claude/skills/* ~/.claude/skills/
+
+# Or symlink them:
+ln -s "$(pwd)/.claude/skills/"* ~/.claude/skills/
 ```
 
-Each `skills/<lang>/` directory installs as a single skill named
-`<lang>-grounding` (e.g. `python-grounding`) under `~/.claude/skills/`, where
-Claude Code picks it up automatically. A language skill is a small router
-`SKILL.md` plus a `references/` directory of topic files the router points to, so
-the agent pulls only the topic it needs.
+Each `.claude/skills/<lang>-grounding/` directory represents a single skill under `~/.claude/skills/`. A language skill is a small router `SKILL.md` plus a `references/` directory of topic files the router points to, so the agent pulls only the topic it needs.
 
 ## Skills
 
