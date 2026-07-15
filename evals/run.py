@@ -47,6 +47,7 @@ CASE_DIRS = [
     REPO_ROOT / "languages" / "python" / "evals",
     REPO_ROOT / "languages" / "julia" / "evals",
     REPO_ROOT / "languages" / "javascript" / "evals",
+    REPO_ROOT / "languages" / "typescript" / "evals",
     REPO_ROOT / "evals" / "cases",
 ]
 RESULTS_DIR = REPO_ROOT / "evals" / "results"

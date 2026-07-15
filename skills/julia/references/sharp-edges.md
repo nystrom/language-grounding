@@ -365,6 +365,32 @@ Always run a function once before timing to separate compilation from execution.
 
 ---
 
+## Function Return Type Annotations Convert (Not Just Assert)
+
+Specifying a return type on a function signature (e.g., `function f(x)::T`) does **not** simply assert the type. Instead, it converts the returned value to the annotated type using `convert(T, val)`.
+
+```julia
+function get_float(x)::Float64
+    return x
+end
+
+get_float(1)  # Returns 1.0 (Float64) — converted silently from Int!
+```
+
+This silent conversion can introduce performance overhead (if conversion is expensive) or hide type bugs.
+
+If you only want a type assertion (which throws an error if the type doesn't match) or to help the compiler's type inference along, annotate the returned expression instead:
+
+```julia
+function get_float(x)
+    return x::Float64  # Type assertion: throws TypeError if x is not Float64
+end
+
+get_float(1)  # Throws: TypeError: typeassert: expected Float64, got a value of type Int64
+```
+
+---
+
 ## What an Agent May Safely Infer
 
 - Non-`const` globals in functions cause type instability.
@@ -372,6 +398,7 @@ Always run a function once before timing to separate compilation from execution.
 - `a[1]` is the first element; `a[0]` is a `BoundsError`.
 - Integer overflow is silent; use `checked_add` if overflow is a concern.
 - `NaN == NaN` is `false`; use `isnan(x)` or `isequal` as needed.
+- Function return type annotations convert returned values instead of only asserting their types.
 
 ## What an Agent Must Not Infer Without Evidence
 
@@ -380,6 +407,7 @@ Always run a function once before timing to separate compilation from execution.
 - That closures capture values — they capture references.
 - That a string index accesses the nth character — it accesses the nth byte.
 - That `==` is the right test for `missing` — it returns `missing`.
+- That annotating a function's return type simply asserts the return type without conversion.
 
 ## What Requires Whole-Program Analysis
 

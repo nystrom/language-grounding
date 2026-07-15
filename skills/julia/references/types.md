@@ -245,6 +245,103 @@ end
 
 ---
 
+### Guidelines for Ensuring Type Stability
+
+To write high-performance Julia code, follow these principles for maintaining type stability:
+
+1. **Avoid Changing the Type of a Local Variable:**
+   Do not assign values of different types to the same variable name within a function. This forces the compiler to infer a `Union` type or `Any`.
+
+   ```julia
+   # Bad: x starts as Int and becomes Float64
+   function bad_local(n)
+       x = 1
+       for i in 1:n
+           x = x * 1.5
+       end
+       return x
+   end
+
+   # Good: initialize with the correct type
+   function good_local(n)
+       x = 1.0
+       for i in 1:n
+           x = x * 1.5
+       end
+       return x
+   end
+   ```
+
+2. **Initialize Variables with Generic Functions (`zero`, `one`, `similar`):**
+   When writing generic code, avoid initializing accumulator variables with literal numbers like `0` or `0.0`. Instead, use `zero(T)`, `one(T)`, `oneunit(T)`, or `zero(x)` where `x` is an input.
+
+   ```julia
+   # Bad: s is always Int, but input elements could be Float64
+   function bad_sum(v::Vector{T}) where T
+       s = 0  # if T is Float64, s + x converts to Float64, making s type-unstable
+       for x in v
+           s += x
+       end
+       return s
+   end
+
+   # Good: s matches the element type of the vector
+   function good_sum(v::Vector{T}) where T
+       s = zero(T)
+       for x in v
+           s += x
+       end
+       return s
+   end
+   ```
+
+3. **Use Function Barriers to Isolate Instability:**
+   If a function must perform a type-unstable operation (such as parsing a file, loading config, or handling dynamic JSON data), split the computation. Resolve the dynamic type first, and then pass the result to a separate, type-stable "kernel" function. The Julia compiler will specialize the kernel function for the concrete types it receives.
+
+   ```julia
+   # Dynamic/unstable wrapper
+   function process_config(config_dict)
+       val = config_dict["value"]  # ::Any
+       return kernel_barrier(val)  # compiles kernel specifically for typeof(val)
+   end
+
+   # Stable kernel
+   function kernel_barrier(val::T) where T
+       # Compute intensely here; T is concrete and stable
+       return val + 1
+   end
+   ```
+
+4. **Use Concrete Types (or Type Parameters) for Struct Fields:**
+   Avoid abstract types (e.g. `Real`, `Integer`, `AbstractArray`) as field types in a struct. Always use concrete types or introduce type parameters to represent them.
+
+   ```julia
+   # Bad: abstract types as fields
+   struct SlowContainer
+       x::Real
+       data::AbstractVector
+   end
+
+   # Good: parameterize the struct to allow concrete fields
+   struct FastContainer{T <: Real, V <: AbstractVector}
+       x::T
+       data::V
+   end
+   ```
+
+5. **Annotate Returned Expressions Instead of Function Signatures:**
+   If the compiler has difficulty inferring a return type, or you want to ensure a specific type is returned, annotate the returned expression (`return x::T`) rather than the function signature (`function f()::T`). Annotating the signature silently calls `convert`, which can degrade performance and hide bugs.
+
+   ```julia
+   # Good: helps type inference/assertion without implicit conversion
+   function process(x)
+       res = compute(x)
+       return res::Float64
+   end
+   ```
+
+---
+
 ## Type Annotations in Functions
 
 Type annotations constrain which methods apply:
@@ -387,6 +484,7 @@ isimmutable(x)   # true if x is not a mutable struct
 - Non-`const` global variables cause type instability in functions that reference them.
 - A `struct` (without `mutable`) has immutable fields after construction.
 - `Union{T, Nothing}` is the standard nullable type; it is efficiently represented.
+- Type stability can be ensured by avoiding variable type changes, using generic initializers (`zero`, `one`), utilizing function barriers, and using concrete struct fields.
 
 ## What an Agent Must Not Infer Without Evidence
 
@@ -394,6 +492,7 @@ isimmutable(x)   # true if x is not a mutable struct
 - That `subtypes(T)` returns all subtypes — only those from currently loaded modules.
 - That a function is type-stable without running `@code_warntype`.
 - That a struct can be subtyped — concrete structs cannot; only abstract types can be subtyped.
+- That local variables automatically maintain a single concrete type if assigned values of different types.
 
 ## What Requires Whole-Program Analysis
 

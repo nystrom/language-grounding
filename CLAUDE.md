@@ -34,13 +34,17 @@ skills/
 ├── julia/
 │   ├── SKILL.md          # router: name julia-grounding
 │   └── references/       # same 8 topics as Python
-└── javascript/
-    ├── SKILL.md          # router: name javascript-grounding
-    └── references/       # semantics, sharp-edges (narrower coverage)
+├── javascript/
+│   ├── SKILL.md          # router: name javascript-grounding
+│   └── references/       # semantics, sharp-edges (narrower coverage)
+└── typescript/
+    ├── SKILL.md          # router: name typescript-grounding
+    └── references/       # semantics, types, sharp-edges, versions, toolchain
 languages/
 ├── python/evals/         # Eval cases for the Python skill
 ├── julia/evals/          # Eval cases for the Julia skill
-└── javascript/evals/     # Eval cases for the JavaScript skill
+├── javascript/evals/     # Eval cases for the JavaScript skill
+└── typescript/evals/     # Eval cases for the TypeScript skill
 ```
 
 ## Adding a New Language
