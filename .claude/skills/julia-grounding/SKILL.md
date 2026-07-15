@@ -29,6 +29,18 @@ reference that matches your question:
 | Footguns: type instability from globals, soft scope, 1-based indexing, column-major arrays, integer overflow, broadcasting | `references/sharp-edges.md` |
 | Pkg.jl programmatic API — never write UUIDs by hand; add/rm/update/develop, Project.toml compat, environments | `references/packages.md` |
 
+## Grounding the Active Version
+
+Whenever writing, editing, or explaining Julia code, you **MUST** first determine the active Julia version to reference the correct version-specific features and syntax.
+
+To detect the active Julia version and environment:
+1. Check [Project.toml](file:///Users/nystrom/work/language-grounding/Project.toml) or [JuliaProject.toml](file:///Users/nystrom/work/language-grounding/JuliaProject.toml) in the workspace for the `[compat]` section (e.g. `julia = "1.10"`).
+2. If the files are missing or the version is ambiguous, check [Manifest.toml](file:///Users/nystrom/work/language-grounding/Manifest.toml).
+3. If still unresolved, run:
+   ```bash
+   julia --version
+   ```
+
 ## What an agent must not infer
 
 Do not assume Julia behaves like Python, MATLAB, or any language you were trained

@@ -28,6 +28,19 @@ target interpreter. Read the reference that matches your question:
 | Footguns: mutable defaults, late binding, `is` vs `==`, class vs instance vars | `references/sharp-edges.md` |
 | pip, uv, venv, pyproject.toml, requirements.txt, editable installs | `references/packages.md` |
 
+## Grounding the Active Version
+
+Whenever writing, editing, or explaining Python code, you **MUST** first determine the active Python version to reference the correct version-specific features and syntax (such as type hinting syntax and standard library APIs).
+
+To detect the active Python version and environment:
+1. Check [pyproject.toml](file:///Users/nystrom/work/language-grounding/pyproject.toml) (look for `requires-python` under `[project]`), [poetry.lock](file:///Users/nystrom/work/language-grounding/poetry.lock), or [.python-version](file:///Users/nystrom/work/language-grounding/.python-version).
+2. If still unresolved, run:
+   ```bash
+   python --version
+   # or when using uv:
+   uv run python --version
+   ```
+
 ## What an agent must not infer
 
 Do not assume Python behaves like JavaScript, Julia, C, or any language you were

@@ -29,6 +29,20 @@ in specific, known places. Read the reference that matches your question:
 | What changed across 5.x, 6.0, and the 7.0 native port; removed options; migration | `references/versions.md` |
 | tsc, the Go-native `tsgo`, key `tsconfig` options, `typescript-eslint`, project references | `references/toolchain.md` |
 
+## Grounding the Active Version
+
+Whenever writing, editing, or explaining TypeScript code, you **MUST** first determine the active TypeScript compiler/runtime version to ensure compatibility with config options and type features.
+
+To detect the active TypeScript version and environment:
+1. Check [package.json](file:///Users/nystrom/work/language-grounding/package.json) under `dependencies` or `devDependencies` (look for `"typescript"`).
+2. Look at the lockfile ([package-lock.json](file:///Users/nystrom/work/language-grounding/package-lock.json), [yarn.lock](file:///Users/nystrom/work/language-grounding/yarn.lock), or [pnpm-lock.yaml](file:///Users/nystrom/work/language-grounding/pnpm-lock.yaml)).
+3. If still unresolved, run:
+   ```bash
+   npx tsc --version
+   # or when using tsgo:
+   tsgo --version
+   ```
+
 ## What an agent must not infer
 
 Do not assume TypeScript behaves like Java, C#, or Flow, and do not assume types

@@ -28,6 +28,17 @@ question from "which release." Read the reference that matches your question:
 | cargo (`check`/`build`/`test`), clippy, rustfmt, rust-analyzer, miri; diagnosing errors | `references/toolchain.md` |
 | Crates/packages/workspaces, `Cargo.toml` vs `Cargo.lock`, semver caret rules, features, `cargo add` | `references/packages.md` |
 
+## Grounding the Active Version
+
+Whenever writing, editing, or explaining Rust code, you **MUST** first determine the active Rust edition and compiler version to reference correct features and APIs.
+
+To detect the active Rust version and environment:
+1. Check [Cargo.toml](file:///Users/nystrom/work/language-grounding/Cargo.toml) for the `edition` key (e.g. `edition = "2021"`) or the `rust-version` minimum bound under `[package]`.
+2. If still unresolved, run:
+   ```bash
+   rustc --version
+   ```
+
 ## What an agent must not infer
 
 Do not reason about Rust as if it were garbage-collected (Java, Go, Python) or as

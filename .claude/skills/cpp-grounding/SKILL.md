@@ -29,6 +29,20 @@ compiler. Read the reference that matches your question:
 | What each standard added (C++11–23, C++26 in progress); `-std`; support vs standard | `references/versions.md` |
 | Compilers and flags, sanitizers (ASan/UBSan/TSan), CMake, clang-format/clang-tidy, debugging | `references/toolchain.md` |
 
+## Grounding the Active Version
+
+Whenever writing, editing, or explaining C++ code, you **MUST** first determine the active C++ standard and compiler version to reference correct features and APIs.
+
+To detect the active C++ version and environment:
+1. Check [CMakeLists.txt](file:///Users/nystrom/work/language-grounding/CMakeLists.txt) for the `CMAKE_CXX_STANDARD` setting (e.g. `set(CMAKE_CXX_STANDARD 17)`).
+2. Look at build configuration files (like `Makefile`, `meson.build`, or compiler flags in `.clang-tidy`).
+3. If still unresolved, run:
+   ```bash
+   g++ --version
+   # or when using clang:
+   clang++ --version
+   ```
+
 ## What an agent must not infer
 
 Do not reason about C++ as if it were garbage-collected or reference-typed (Java,
