@@ -230,7 +230,7 @@ cases:
     prompt: >
       What does this program print?
     code: |
-      a = 1e15
+      a = 1e16
       b = 1.0
       print((a + b) - a)
     choices:
@@ -241,9 +241,10 @@ cases:
     expected_output: "0.0"
     wrong_output_reason: >
       "1.0" — assumes floating-point addition preserves the small addend.
-      At the magnitude of 1e15, the spacing between consecutive floats (ulp) is
-      larger than 1.0. Adding 1.0 to 1e15 produces the same float as 1e15, so
-      subtracting 1e15 yields exactly 0.0. The small value is completely lost.
+      At the magnitude of 1e16, the spacing between consecutive floats (ulp) is
+      2.0, larger than 1.0. Adding 1.0 to 1e16 produces the same float as 1e16, so
+      subtracting 1e16 yields exactly 0.0. The small value is completely lost.
+      (At 1e15 the ulp is only 0.125, so the 1.0 would survive.)
 
   - id: py.float.decimal_exact
     skill: python-sharp-edges
@@ -275,10 +276,10 @@ cases:
       print(repr(0.1))
       print(0.1 == 0.10000000000000001)
     choices:
-      - "'0.1'\nFalse"
-      - "'0.10000000000000001'\nTrue"
-      - "'0.1'\nTrue"
-    expected_output: "'0.1'\nTrue"
+      - "0.1\nFalse"
+      - "0.10000000000000001\nTrue"
+      - "0.1\nTrue"
+    expected_output: "0.1\nTrue"
     wrong_output_reason: >
       "'0.10000000000000001'\nTrue" — expects Python 2's verbose repr.
       Python 3 uses the shortest decimal string that round-trips to the same float.
@@ -310,8 +311,8 @@ cases:
     prompt: >
       What does this program print?
     code: |
-      print(10**23 == float(10**23))
-      print(10**23 + 1 == float(10**23))
+      print(10**22 == float(10**22))
+      print(10**22 + 1 == float(10**22))
     choices:
       - "True\nTrue"
       - "False\nFalse"
@@ -320,10 +321,10 @@ cases:
     expected_output: "True\nFalse"
     wrong_output_reason: >
       "True\nTrue" — assumes both comparisons convert the int to float.
-      For the first comparison, 10**23 is exactly representable as a float so
-      == is True. For the second, Python compares the int 10**23+1 exactly against
-      the float value; since 10**23+1 is not representable as a float, Python
-      detects they are not equal even though float(10**23+1) == float(10**23).
+      For the first comparison, 10**22 is exactly representable as a float so
+      == is True. For the second, Python compares the int 10**22+1 exactly against
+      the float value; since 10**22+1 is not representable as a float, Python
+      detects they are not equal even though float(10**22+1) == float(10**22).
     note: >
       Python's int/float comparison converts to a rational representation
       internally to avoid precision loss, not simply to float.

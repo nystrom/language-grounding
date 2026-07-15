@@ -25,6 +25,7 @@ Requirements:
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -45,6 +46,8 @@ SKILLS_DIR = REPO_ROOT / "skills"
 CASE_DIRS = [
     REPO_ROOT / "languages" / "python" / "evals",
     REPO_ROOT / "languages" / "julia" / "evals",
+    REPO_ROOT / "languages" / "javascript" / "evals",
+    REPO_ROOT / "languages" / "typescript" / "evals",
     REPO_ROOT / "evals" / "cases",
 ]
 RESULTS_DIR = REPO_ROOT / "evals" / "results"
@@ -59,11 +62,13 @@ SYSTEM_BASE = (
 # ── Skills loading ─────────────────────────────────────────────────────────
 
 def load_all_skills() -> str:
+    # Each language skill is a router SKILL.md plus references/*.md; inject both
+    # so the grounding content (which lives in the references) reaches the model.
     parts = []
-    for skill_file in sorted(SKILLS_DIR.rglob("SKILL.md")):
-        parts.append(skill_file.read_text())
+    for md_file in sorted(SKILLS_DIR.rglob("*.md")):
+        parts.append(md_file.read_text())
     if not parts:
-        print(f"WARNING: No SKILL.md files found in {SKILLS_DIR}", file=sys.stderr)
+        print(f"WARNING: No skill markdown found in {SKILLS_DIR}", file=sys.stderr)
     return "\n\n---\n\n".join(parts)
 
 
@@ -116,6 +121,25 @@ def build_user_prompt(case: dict) -> str:
 
 # ── Grading ────────────────────────────────────────────────────────────────
 
+def token_match(haystack: str, needle: str) -> bool:
+    """True if needle appears in haystack as a whole token.
+
+    A word boundary is required only on the sides where needle itself ends in
+    a word character, so "2.67" does not match inside "2.675" and "true" does
+    not match inside "construe", while values like "<class 'int'>" (non-word
+    edges) still match when surrounded by spaces. This removes lexical false
+    passes; it cannot catch semantic ones (e.g. "not False" contains "false").
+    """
+    if not needle:
+        return True
+    pat = re.escape(needle)
+    if re.match(r"\w", needle[0]):
+        pat = r"(?<!\w)" + pat
+    if re.search(r"\w\Z", needle):
+        pat = pat + r"(?!\w)"
+    return re.search(pat, haystack) is not None
+
+
 def grade(case: dict, response: str) -> tuple[bool, str]:
     """Returns (passed, reason)."""
     r = response.lower()
@@ -123,10 +147,10 @@ def grade(case: dict, response: str) -> tuple[bool, str]:
     if "expected_output" in case:
         expected = case["expected_output"].lower()
         # Multi-line outputs: each line must appear somewhere in the response
-        lines = [ln.strip() for ln in expected.split("\\n") if ln.strip()]
+        lines = [ln.strip() for ln in expected.split("\n") if ln.strip()]
         if not lines:
             lines = [expected]
-        missing = [ln for ln in lines if ln not in r]
+        missing = [ln for ln in lines if not token_match(r, ln)]
         if not missing:
             return True, f"contains expected: {case['expected_output']!r}"
         return False, (
@@ -137,12 +161,12 @@ def grade(case: dict, response: str) -> tuple[bool, str]:
     if "expected_behavior" in case:
         eb = case["expected_behavior"]
         for phrase in eb.get("must_not_say", []):
-            if phrase.lower() in r:
+            if token_match(r, phrase.lower()):
                 return False, f"said forbidden phrase: {phrase!r}"
         candidates = eb.get("must_say_one_of", [])
         if candidates:
             for phrase in candidates:
-                if phrase.lower() in r:
+                if token_match(r, phrase.lower()):
                     return True, f"said required phrase: {phrase!r}"
             return False, f"none of must_say_one_of found; expected one of: {candidates}"
         return True, "no must_say_one_of required"

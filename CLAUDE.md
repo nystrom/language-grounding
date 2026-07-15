@@ -16,38 +16,50 @@ A collection of Claude Code skills that ground agents in language semantics, pre
 ./install.sh python julia
 ```
 
-Skills are copied from `skills/<lang>/<topic>/SKILL.md` to `~/.claude/skills/<lang>-<topic>/SKILL.md`.
+Each `skills/<lang>/` installs as one skill named `<lang>-grounding` at
+`~/.claude/skills/<lang>-grounding/` — the whole directory (router `SKILL.md`
+plus `references/`) is copied.
 
 ## Structure
+
+Each language is a single skill: a router `SKILL.md` that points to per-topic
+files under `references/`.
 
 ```
 skills/
 ├── python/
-│   ├── semantics/    # Scoping, closures, mutability, MRO, generators
-│   ├── types/        # Type hints by version, TypeVar, Protocol
-│   ├── toolchain/    # ruff, mypy, pyright, pyrefly
-│   ├── versions/     # What changed in 3.9–3.13
-│   └── sharp-edges/  # Footguns: mutable defaults, late binding, etc.
-└── julia/
-    ├── semantics/    # Multiple dispatch, scoping, macros, broadcasting
-    ├── types/        # Parametric types, type stability, where clauses
-    ├── toolchain/    # Pkg.jl, JET.jl, Revise.jl, BenchmarkTools
-    ├── versions/     # What changed in 1.6–1.11
-    └── sharp-edges/  # Type instability, soft scope, column-major arrays
+│   ├── SKILL.md          # router: name python-grounding, indexes references
+│   └── references/       # semantics, types, stdlib, toolchain,
+│                         #   versions, errors, sharp-edges, packages
+├── julia/
+│   ├── SKILL.md          # router: name julia-grounding
+│   └── references/       # same 8 topics as Python
+├── javascript/
+│   ├── SKILL.md          # router: name javascript-grounding
+│   └── references/       # semantics, sharp-edges (narrower coverage)
+└── typescript/
+    ├── SKILL.md          # router: name typescript-grounding
+    └── references/       # semantics, types, sharp-edges, versions, toolchain
 languages/
-├── python/           # Reference material for Python skill authoring
-└── julia/            # Reference material for Julia skill authoring
+├── python/evals/         # Eval cases for the Python skill
+├── julia/evals/          # Eval cases for the Julia skill
+├── javascript/evals/     # Eval cases for the JavaScript skill
+└── typescript/evals/     # Eval cases for the TypeScript skill
 ```
 
 ## Adding a New Language
 
-1. Create `skills/<lang>/` with subdirectories per topic
-2. Each topic needs a `SKILL.md` — the install script picks up all `SKILL.md` files recursively
-3. Add the language to `README.md` with a skill table
-4. `./install.sh <lang>` to verify installation works
+1. Create `skills/<lang>/references/<topic>.md` files for each topic
+2. Create `skills/<lang>/SKILL.md` — a router with `name: <lang>-grounding`
+   frontmatter and a table pointing to each `references/<topic>.md`
+3. Add the language to `README.md` under Skills
+4. `./install.sh <lang>` to verify installation works (auto-discovered — no
+   change to `install.sh` needed)
 
 ## Skill Design Principles
 
-Each skill answers agent questions: Can I parse this? What does this do? Is this edit safe? Why did this fail? What is the idiomatic way?
+Each reference answers agent questions: Can I parse this? What does this do? Is
+this edit safe? Why did this fail? What is the idiomatic way?
 
-Every skill must include a **"What an agent may/must not infer"** section to block analogical hallucination from other languages.
+Every reference must include a **"What an agent may/must not infer"** section to
+block analogical hallucination from other languages and version confusion.
