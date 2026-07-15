@@ -80,15 +80,6 @@ Narrower coverage than Python and Julia — two topics so far.
 | `versions` | 5.x milestones, the 6.0 option removals, and the 7.0 Go-native port; migration |
 | `toolchain` | `tsc`/`tsgo`, `tsconfig` strictness and module options, type-check vs transpile, `typescript-eslint` |
 
-### Upgrading from an earlier layout
-
-Earlier versions installed one skill per topic (`python-semantics`,
-`python-types`, …). Those directories are now obsolete; remove the stale ones:
-
-```bash
-rm -rf ~/.claude/skills/{python,julia,javascript}-{semantics,types,toolchain,versions,sharp-edges,errors,stdlib,packages}
-```
-
 ## Evals
 
 249 regression test cases measure how accurately Claude answers
